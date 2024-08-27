@@ -35,7 +35,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 - Access controls to restrict access to network scanning tools and monitor for unauthorized use
 - Vulnerability scan endpoints to identify and remediate current weaknesses
 - Encrypt data at rest and in transfit to promote confidentiality
-- Least privilege to o limit user access to only what is necessary 
+- Least privilege to limit user access to only what is necessary 
   
 ## Steps
 
@@ -45,6 +45,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
   ip a s
   ```
   ![ip a s](https://github.com/user-attachments/assets/dc35ee6c-cd5b-40b6-9c1b-9a0d2a8bc2f5)
+
 - The IP and subnet range found is 10.0.2.0/24
 - Pinged the network to see which hosts were active:
   
@@ -82,8 +83,6 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
 - The nmap scanned provided a username: Chewbacca
 - While exploring for another vulnerability, an SSH brute-force was attempted on the user
-
-### Weaponization, Delivery, Exploitation
 - To attempt an SSH brute-force, the following was ran in Metasploit:
   
   ```bash
@@ -99,6 +98,8 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
   ```
 
   ![bruteforce](https://github.com/user-attachments/assets/bb4b9796-74c7-4b06-8174-f4e255a3ba34)
+
+### Weaponization, Delivery, Exploitation
 
 - A search was ran in Metasploit on ProFTPD to investigate potential exploits:
 
@@ -124,6 +125,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
   ![Protdp exploit](https://github.com/user-attachments/assets/fcd7c6b2-190e-4f3b-ac91-72c49feb8096)
 
 - Once the connection to the target host was successful, the directory was changed to /etc to move into the password and shadow file directory
+  
   ```bash
   cd /etc
 
@@ -269,7 +271,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
   ![flag 1 p1](https://github.com/user-attachments/assets/b5260f8a-a7cf-4c63-b4f1-ab2763ed7926)
 
-- Once I found the first document, I used the secure copy protocol to transfer the document onto local host:
+- Once I found the first document, I used the secure copy protocol to transfer the document onto my local host:
   
   ```bash
   scp hacker@10.0.2.6:/lost+found/3_of_hearts.png /home/ant/Downloads/
@@ -277,13 +279,14 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
   ![flag 1 p2](https://github.com/user-attachments/assets/9764f36f-e89a-4c9a-9cf7-374fae076d9b)
 
-  ![flag 1 p3](https://github.com/user-attachments/assets/d6348533-5861-4fa8-a4bd-58e747a24800)
+  <img src="https://github.com/user-attachments/assets/d6348533-5861-4fa8-a4bd-58e747a24800" alt="flag 1 p3" height="400"/>
 
 - Document number 2:
   
   ![chrome_C0q16Sqxf6](https://github.com/user-attachments/assets/3711ef59-ef84-42e2-8b7c-9dc902a452ff)
 
-  ![chrome_zP7yjo6Ozh](https://github.com/user-attachments/assets/4d98dc68-2f8e-4edf-93b9-d7baa3744341)
+  <img src="https://github.com/user-attachments/assets/4d98dc68-2f8e-4edf-93b9-d7baa3744341" alt="chrome_zP7yjo6Ozh" height="400"/>
+
 
 - To find document 3, I used the 'find' command in the root directory / and * as a wildcard:
 
@@ -294,7 +297,11 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
   ![flag 3 p2](https://github.com/user-attachments/assets/c32ae5fc-cfc0-4f8d-8fc6-935a61525894)
 
-  ![flag 3 p3](https://github.com/user-attachments/assets/fdae9604-da2b-4bd4-a2b9-462b6f80a981)
+  <img src="https://github.com/user-attachments/assets/fdae9604-da2b-4bd4-a2b9-462b6f80a981" alt="flag 3 p3" height="400"/>
+
+
+CTF (to be continued...)
+
 
 ### Additional Investigations
 
@@ -302,7 +309,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 - After further investigation, I noticed the HTTP and MySQL servers were open
 - I went to the host's address 10.0.2.6 and discovered:
   
-  ![HTTP Server](https://github.com/user-attachments/assets/2639ff29-4cff-48da-8a5a-0ee892aec7b7)
+  <img src="https://github.com/user-attachments/assets/2639ff29-4cff-48da-8a5a-0ee892aec7b7" alt="HTTP Server" height="400"/>
 
 - At first, I attempted some SQL Injections such as:
   
