@@ -28,6 +28,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 - Hashcat - A hashed passwords cracking tool that supports various hashes
 - SQLMap - An open-source penetration tool that automates the process of detecting and exploiting SQL injection flaws and enumerates data
 - Netcat - A network utility for reading from and writing to network connections using TCP and UDP
+- Secure Copy Protocol (SCP) - A means of securely transferring computer files between two hosts
 
 ### Proposed Hardening
 
@@ -99,8 +100,11 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
 
   ![bruteforce](https://github.com/user-attachments/assets/bb4b9796-74c7-4b06-8174-f4e255a3ba34)
 
+- Chewbacca's password was not in the rockyou.txt file, so I began to explore new avenues to access the system
+
 ### Weaponization, Delivery, Exploitation
 
+- The results from the nmap -sV scan showed port 21 open and the version for ProFTPD was 1.3.5
 - A search was ran in Metasploit on ProFTPD to investigate potential exploits:
 
   ![proftpd search](https://github.com/user-attachments/assets/23139e70-6b78-4b2e-943a-8679bad7abde)
@@ -349,7 +353,11 @@ CTF (to be continued...)
   ![sqlmap4](https://github.com/user-attachments/assets/3ba2a9da-b1ec-42f0-8822-3c3b742c5170)
 
 
+## Conclusion
 
+- 	In this project, I applied penetration testing techniques to simulate an attack on a Metasploitable server, systematically exploring each phase of the Cyber Kill Chain framework. The reconnaissance phase involved using Nmap to map the network, identify active hosts, and scan for open ports with potential vulnerabilities. This initial phase paved the way for weaponization, delivery, and exploitation, where I targeted an outdated software installation with a Metasploit exploit to gain access via a reverse shell. Once inside, I exploited a known vulnerability in pkexec to escalate my privileges to root, allowing me to implant a new user and modify SSH configurations to ensure persistent control of the target system.
+
+ This project provided immeasurable value by enhancing my practical application of the Cyber Kill Chain methodology in a real-world scenario. I improved my proficiency with essential tools and gained a deeper understanding of the significance of each Cyber Kill Chain phase. The project underscored the necessity of continuous learning and adaptability in cybersecurity. Despite initially failing to obtain Chewbacca's password, I learned the importance of pivoting and thinking creatively. This experience unexpectedly pushed me towards my first Capture The Flag (CTF) challenge, further expanding my skills in tools, Linux command-line operations, and problem-solving. Furthermore, this exercise highlighted the critical importance of blue team efforts in developing robust security measures and incident response strategies to effectively counteract and mitigate potential attacks. Understanding red team tactics has reinforced the need for defense mechanisms and regular system updates to maintain a proper security posture.
 
 
 
